@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.firebase_mock.sign_in.SignInManager
 import com.example.firebase_mock.ui.theme.FirebaseMocklicationTheme
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -25,14 +26,18 @@ class MainActivity : ComponentActivity() {
         get() = ""
     private lateinit var auth: FirebaseAuth
 
+    lateinit val signInManager : SignInManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+        signInManager = SignInManager(context = applicationContext)
         auth = Firebase.auth
         if (auth.currentUser == null) {
             // Not signed in, launch the Sign In activity
-            startActivity(Intent(this, SignInActivity::class.java))
-            finish()
+            signInManager.SignInWithGoogle()
+//            startActivity(Intent(this, SignInActivity::class.java))
+//            finish()
             return
         }
 
@@ -54,8 +59,9 @@ class MainActivity : ComponentActivity() {
         // Check if user is signed in.
         if (auth.currentUser == null) {
             // Not signed in, launch the Sign In activity
-            startActivity(Intent(this, SignInActivity::class.java))
-            finish()
+            signInManager.SignInWithGoogle()
+//            startActivity(Intent(this, SignInActivity::class.java))
+//            finish()
             return
         }
     }
@@ -66,15 +72,16 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun getUserName(): String? {
-        val user = auth.currentUser
-        return if (user != null) {
-            user.displayName
-        } else ANONYMOUS
+        return null
+//        val user = auth.currentUser
+//        return if (user != null) {
+//            user.displayName
+//        } else ANONYMOUS
     }
 
     private fun signOut() {
+        // TODO
 //        AuthUI.getInstance().signOut()
-        startActivity(Intent(this, SignInActivity::class.java))
         finish()
     }
 }
