@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
         get() = ""
     private lateinit var auth: FirebaseAuth
 
-    lateinit val signInManager : SignInManager
+    lateinit var signInManager : SignInManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
