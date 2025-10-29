@@ -1,10 +1,10 @@
 package com.example.firebase_mock
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -12,97 +12,119 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 import com.example.firebase_mock.sign_in.SignInManager
 import com.example.firebase_mock.ui.theme.FirebaseMocklicationTheme
 import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 
 
 class MainActivity : ComponentActivity() {
     private val MainActivity.ANONYMOUS: String?
         get() = ""
-    private lateinit var auth: FirebaseAuth
+    private var auth = Firebase.auth
 
-    lateinit var signInManager : SignInManager
+    lateinit var signInManager: SignInManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        signInManager = SignInManager(context = applicationContext)
-        auth = Firebase.auth
-        if (auth.currentUser == null) {
-            // Not signed in, launch the Sign In activity
-            signInManager.SignInWithGoogle()
-//            startActivity(Intent(this, SignInActivity::class.java))
-//            finish()
-            return
-        }
+//        if (auth.currentUser == null) {
+//            // Not signed in, launch the Sign In activity
+//            val res = signInManager.SignInWithGoogle()
+//            if (res is AuthResponse.Success) {
+//
+//            }
+//        }
+
 
         enableEdgeToEdge()
         setContent {
             FirebaseMocklicationTheme {
+                val context = LocalContext.current
+                val signInManager = remember { SignInManager(context = context) }
+                val coroutineScope = rememberCoroutineScope()
+                val navController = rememberNavController()
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
+                    MyNavHost(
+                        navController = navController,
                         modifier = Modifier.padding(innerPadding)
                     )
+//                    Greeting(
+//                        name = "str",
+//                        onSignIn = {
+//                            signInManager.SignInWithGoogle()
+//                                .onEach { authResponse ->
+//                                    if (authResponse is AuthResponse.Error) {
+//                                        Log.w(context.attributionTag, authResponse.message  )
+//                                    }
+//                                }.launchIn(coroutineScope)
+//                        },
+//                        onSignUp = {
+//                            signInManager.SignInWithGoogle()
+//                                .onEach { authResponse ->
+//                                    if (authResponse is AuthResponse.Error) {
+//                                        Log.w(context.attributionTag, authResponse.message  )
+//                                    }
+//                                }.launchIn(coroutineScope)
+//                        },
+//                        modifier = Modifier.padding(innerPadding),
+//                    )
                 }
             }
         }
     }
-
-    public override fun onStart() {
-        super.onStart()
-        // Check if user is signed in.
-        if (auth.currentUser == null) {
-            // Not signed in, launch the Sign In activity
-            signInManager.SignInWithGoogle()
-//            startActivity(Intent(this, SignInActivity::class.java))
-//            finish()
-            return
-        }
-    }
-
-    private fun getPhotoUrl(): String? {
-        val user = auth.currentUser
-        return user?.photoUrl?.toString()
-    }
-
-    private fun getUserName(): String? {
-        return null
+//
+//    private fun getPhotoUrl(): String? {
 //        val user = auth.currentUser
-//        return if (user != null) {
-//            user.displayName
-//        } else ANONYMOUS
-    }
+//        return user?.photoUrl?.toString()
+//    }
 
-    private fun signOut() {
-        // TODO
-//        AuthUI.getInstance().signOut()
-        finish()
-    }
+//    private fun getUserName(): String? {
+//        return null
+////        val user = auth.currentUser
+////        return if (user != null) {
+////            user.displayName
+////        } else ANONYMOUS
+//    }
+
+//    private fun signOut() {
+//        // TODO
+////        AuthUI.getInstance().signOut()
+//        finish()
+//    }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Column {
+fun Greeting(
+    name: String,
+    onSignIn: () -> Unit,
+    onSignUp: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        verticalArrangement = Arrangement.Center
+    ) {
         Text(
             text = "Hello $name!",
             modifier = modifier
         )
         Button(
-            // Crash trigger
-            // TODO: remove
-//            onClick = { throw RuntimeException("Test Crash") },
-            onClick = {  },
+            onClick = onSignIn,
             modifier = modifier
         ) {
-            Text(
-                text = "Crash"
-            )
+            Text("Sign in")
+        }
+        Button(
+            onClick = onSignIn,
+            modifier = modifier
+        ) {
+            Text("Sign up")
         }
     }
 }
@@ -111,6 +133,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     FirebaseMocklicationTheme {
-        Greeting("Android")
+        Greeting("Android", {}, {})
     }
 }
